@@ -47,6 +47,10 @@ jobs:
           echo "dependencies {" >> app/build.gradle.kts
           echo "    implementation(\"androidx.lifecycle:lifecycle-runtime-ktx:2.7.0\")" >> app/build.gradle.kts
           echo "    implementation(\"androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0\")" >> app/build.gradle.kts
+          echo "    implementation(\"androidx.activity:activity-compose:1.8.2\")" >> app/build.gradle.kts
+          echo "    implementation(\"androidx.compose.material:material-icons-extended:1.6.0\")" >> app/build.gradle.kts
+          echo "    implementation(\"dev.rikka.shizuku:api:13.1.5\")" >> app/build.gradle.kts
+          echo "    implementation(\"dev.rikka.shizuku:provider:13.1.5\")" >> app/build.gradle.kts
           echo "}" >> app/build.gradle.kts
         fi
 
