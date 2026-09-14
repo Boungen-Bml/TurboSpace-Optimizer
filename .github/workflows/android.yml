@@ -19,7 +19,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Extract Zip and Generate Gradle Wrapper
+    - name: Prepare Project and Fix Manifest
       run: |
         ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
         if [ -n "$ZIP_FILE" ]; then
@@ -27,6 +27,15 @@ jobs:
         fi
 
         cd TurboSpaceOptimizer
+
+        sed -i 's/package="com.turbospace.optimizer"//g' app/src/main/AndroidManifest.xml
+
+        sed -i '/android:icon/d' app/src/main/AndroidManifest.xml
+        sed -i '/android:roundIcon/d' app/src/main/AndroidManifest.xml
+
+        if ! grep -q "android.suppressUnsupportedCompileSdk" gradle.properties; then
+          echo "android.suppressUnsupportedCompileSdk=35" >> gradle.properties
+        fi
 
         gradle wrapper --gradle-version 8.7
         chmod +x gradlew
