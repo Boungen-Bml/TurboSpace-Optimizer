@@ -19,7 +19,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Prepare Project and Fix Everything
+    - name: Prepare Project and Inject Dependencies
       run: |
         ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
         if [ -n "$ZIP_FILE" ]; then
@@ -42,17 +42,15 @@ jobs:
           echo "android.suppressUnsupportedCompileSdk=35" >> gradle.properties
         fi
 
-        if ! grep -q "lifecycle-runtime-ktx" app/build.gradle.kts; then
-          echo "" >> app/build.gradle.kts
-          echo "dependencies {" >> app/build.gradle.kts
-          echo "    implementation(\"androidx.lifecycle:lifecycle-runtime-ktx:2.7.0\")" >> app/build.gradle.kts
-          echo "    implementation(\"androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0\")" >> app/build.gradle.kts
-          echo "    implementation(\"androidx.activity:activity-compose:1.8.2\")" >> app/build.gradle.kts
-          echo "    implementation(\"androidx.compose.material:material-icons-extended:1.6.0\")" >> app/build.gradle.kts
-          echo "    implementation(\"dev.rikka.shizuku:api:13.1.5\")" >> app/build.gradle.kts
-          echo "    implementation(\"dev.rikka.shizuku:provider:13.1.5\")" >> app/build.gradle.kts
-          echo "}" >> app/build.gradle.kts
-        fi
+        echo "" >> app/build.gradle.kts
+        echo "dependencies {" >> app/build.gradle.kts
+        echo "    implementation(\"androidx.lifecycle:lifecycle-runtime-ktx:2.7.0\")" >> app/build.gradle.kts
+        echo "    implementation(\"androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0\")" >> app/build.gradle.kts
+        echo "    implementation(\"androidx.activity:activity-compose:1.8.2\")" >> app/build.gradle.kts
+        echo "    implementation(\"androidx.compose.material:material-icons-extended:1.6.0\")" >> app/build.gradle.kts
+        echo "    implementation(\"dev.rikka.shizuku:api:13.1.5\")" >> app/build.gradle.kts
+        echo "    implementation(\"dev.rikka.shizuku:provider:13.1.5\")" >> app/build.gradle.kts
+        echo "}" >> app/build.gradle.kts
 
         gradle wrapper --gradle-version 8.7
         chmod +x gradlew
