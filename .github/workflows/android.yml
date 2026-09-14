@@ -19,7 +19,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Prepare Project and Fix Manifest
+    - name: Prepare Project and Fix Everything
       run: |
         ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
         if [ -n "$ZIP_FILE" ]; then
@@ -28,13 +28,26 @@ jobs:
 
         cd TurboSpaceOptimizer
 
-        sed -i 's/package="com.turbospace.optimizer"//g' app/src/main/AndroidManifest.xml
+        if ! grep -q "org.gradle.jvmargs" gradle.properties; then
+          echo "org.gradle.jvmargs=-Xmx3072m -Dfile.encoding=UTF-8" >> gradle.properties
+        else
+          sed -i 's/org.gradle.jvmargs=.*/org.gradle.jvmargs=-Xmx3072m -Dfile.encoding=UTF-8/g' gradle.properties
+        fi
 
+        sed -i 's/package="com.turbospace.optimizer"//g' app/src/main/AndroidManifest.xml
         sed -i '/android:icon/d' app/src/main/AndroidManifest.xml
         sed -i '/android:roundIcon/d' app/src/main/AndroidManifest.xml
 
         if ! grep -q "android.suppressUnsupportedCompileSdk" gradle.properties; then
           echo "android.suppressUnsupportedCompileSdk=35" >> gradle.properties
+        fi
+
+        if ! grep -q "lifecycle-runtime-ktx" app/build.gradle.kts; then
+          echo "" >> app/build.gradle.kts
+          echo "dependencies {" >> app/build.gradle.kts
+          echo "    implementation(\"androidx.lifecycle:lifecycle-runtime-ktx:2.7.0\")" >> app/build.gradle.kts
+          echo "    implementation(\"androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0\")" >> app/build.gradle.kts
+          echo "}" >> app/build.gradle.kts
         fi
 
         gradle wrapper --gradle-version 8.7
