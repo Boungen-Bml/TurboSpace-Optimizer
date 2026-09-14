@@ -19,17 +19,25 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Extract Zip and Build APK
+    - name: Debug and Extract Zip
       run: |
+        echo "=== Current Repository Files ==="
+        ls -la
+        
         ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
         if [ -n "$ZIP_FILE" ]; then
+          echo "Found ZIP file: $ZIP_FILE"
           unzip -o "$ZIP_FILE"
         fi
 
+        echo "=== All Extracted Files ==="
+        find . -maxdepth 4
+
+    - name: Find Gradlew and Build
+      run: |
         GRADLEW_PATH=$(find . -name "gradlew" -type f | head -n 1)
         if [ -z "$GRADLEW_PATH" ]; then
-          echo "Error: gradlew file not found!"
-          ls -la
+          echo "Error: gradlew file not found anywhere!"
           exit 1
         fi
 
