@@ -44,13 +44,24 @@ jobs:
           echo "android.suppressUnsupportedCompileSdk=35" >> gradle.properties
         fi
 
-        # Remove problematic ViewTree lines and force import Settings icon correctly
+        # ==========================================
+        # KOTLIN FILE RESTRUCTURING (THE ULTIMATE FIX)
+        # ==========================================
         MAIN_FILE="app/src/main/java/com/turbospace/optimizer/MainActivity.kt"
         if [ -f "$MAIN_FILE" ]; then
+          # 1. Remove all existing package lines to prevent duplication
+          sed -i '/^package /d' "$MAIN_FILE"
+          
+          # 2. Insert package declaration at the absolute first line of the file
+          sed -i '1i package com.turbospace.optimizer' "$MAIN_FILE"
+          
+          # 3. Remove all problematic ViewTree lines
           sed -i '/ViewTreeLifecycleOwner/d' "$MAIN_FILE"
           sed -i '/ViewTreeViewModelStoreOwner/d' "$MAIN_FILE"
           sed -i '/setViewTreeSavedStateRegistryOwner/d' "$MAIN_FILE"
-          sed -i '/package com.turbospace.optimizer/a import androidx.compose.material.icons.filled.Settings' "$MAIN_FILE"
+          
+          # 4. Force replace Icons.Filled.Settings with SettingsIcon
+          sed -i 's/Icons.Filled.Settings/SettingsIcon/g' "$MAIN_FILE"
         fi
 
         # Update everything to the absolute latest versions
@@ -134,4 +145,4 @@ jobs:
       with:
         name: TurboSpace-Optimizer-APK
         path: '**/app/build/outputs/apk/debug/*.apk'
-
+        
