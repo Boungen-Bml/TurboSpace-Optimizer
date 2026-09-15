@@ -44,11 +44,11 @@ jobs:
           echo "android.suppressUnsupportedCompileSdk=35" >> gradle.properties
         fi
 
-        # Rewriting app/build.gradle.kts directly to ensure correct imports
+        # Write clean build.gradle.kts using direct plugin IDs instead of libs alias
         cat << 'EOF' > app/build.gradle.kts
         plugins {
-            alias(libs.plugins.android.application)
-            alias(libs.plugins.kotlin.android)
+            id("com.android.application")
+            id("org.jetbrains.kotlin.android")
         }
 
         android {
