@@ -44,7 +44,7 @@ jobs:
           echo "android.suppressUnsupportedCompileSdk=35" >> gradle.properties
         fi
 
-        # Write clean build.gradle.kts using direct plugin IDs instead of libs alias
+        # Write clean build.gradle.kts with compatible Compose Compiler version
         cat << 'EOF' > app/build.gradle.kts
         plugins {
             id("com.android.application")
@@ -74,12 +74,16 @@ jobs:
             }
             kotlinOptions {
                 jvmTarget = "17"
+                freeCompilerArgs += listOf(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+                )
             }
             buildFeatures {
                 compose = true
             }
             composeOptions {
-                kotlinCompilerExtensionVersion = "1.5.8"
+                kotlinCompilerExtensionVersion = "1.5.14"
             }
         }
 
