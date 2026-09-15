@@ -19,7 +19,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Prepare Project and Fix Kotlin Version
+    - name: Prepare Project and Inject Fixes
       run: |
         ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
         if [ -n "$ZIP_FILE" ]; then
@@ -28,10 +28,8 @@ jobs:
 
         cd TurboSpaceOptimizer
 
-        # Fix invalid Kotlin version 2.4.0 -> 2.0.0
-        sed -i 's/2.4.0/2.0.0/g' build.gradle.kts app/build.gradle.kts settings.gradle.kts 2>/dev/null || true
+        find . -type f \( -name "*.kts" -o -name "*.properties" \) -exec sed -i 's/2.4.0/2.0.0/g' {} +
 
-        # Ensure repositories and memory settings
         if ! grep -q "org.gradle.jvmargs" gradle.properties; then
           echo "org.gradle.jvmargs=-Xmx3072m -Dfile.encoding=UTF-8" >> gradle.properties
         else
@@ -46,18 +44,15 @@ jobs:
           echo "android.suppressUnsupportedCompileSdk=35" >> gradle.properties
         fi
 
-        # Inject required dependencies
-        if ! grep -q "lifecycle-runtime-ktx" app/build.gradle.kts; then
-          echo "" >> app/build.gradle.kts
-          echo "dependencies {" >> app/build.gradle.kts
-          echo "    implementation(\"androidx.lifecycle:lifecycle-runtime-ktx:2.7.0\")" >> app/build.gradle.kts
-          echo "    implementation(\"androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0\")" >> app/build.gradle.kts
-          echo "    implementation(\"androidx.activity:activity-compose:1.8.2\")" >> app/build.gradle.kts
-          echo "    implementation(\"androidx.compose.material:material-icons-extended:1.6.0\")" >> app/build.gradle.kts
-          echo "    implementation(\"dev.rikka.shizuku:api:13.1.5\")" >> app/build.gradle.kts
-          echo "    implementation(\"dev.rikka.shizuku:provider:13.1.5\")" >> app/build.gradle.kts
-          echo "}" >> app/build.gradle.kts
-        fi
+        echo "" >> app/build.gradle.kts
+        echo "dependencies {" >> app/build.gradle.kts
+        echo "    implementation(\"androidx.lifecycle:lifecycle-runtime-ktx:2.7.0\")" >> app/build.gradle.kts
+        echo "    implementation(\"androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0\")" >> app/build.gradle.kts
+        echo "    implementation(\"androidx.activity:activity-compose:1.8.2\")" >> app/build.gradle.kts
+        echo "    implementation(\"androidx.compose.material:material-icons-extended:1.6.0\")" >> app/build.gradle.kts
+        echo "    implementation(\"dev.rikka.shizuku:api:13.1.5\")" >> app/build.gradle.kts
+        echo "    implementation(\"dev.rikka.shizuku:provider:13.1.5\")" >> app/build.gradle.kts
+        echo "}" >> app/build.gradle.kts
 
         gradle wrapper --gradle-version 8.7
         chmod +x gradlew
