@@ -44,8 +44,11 @@ jobs:
           echo "android.suppressUnsupportedCompileSdk=35" >> gradle.properties
         fi
 
-        # Fix missing imports directly in MainActivity.kt
-        sed -i '1i import androidx.lifecycle.ViewTreeLifecycleOwner\nimport androidx.lifecycle.ViewTreeViewModelStoreOwner\nimport androidx.savedstate.setViewTreeSavedStateRegistryOwner' app/src/main/java/com/turbospace/optimizer/MainActivity.kt 2>/dev/null || true
+        # Safely insert ViewTree imports right below package declaration
+        MAIN_FILE="app/src/main/java/com/turbospace/optimizer/MainActivity.kt"
+        if [ -f "$MAIN_FILE" ]; then
+          sed -i '/package com.turbospace.optimizer/a import androidx.lifecycle.ViewTreeLifecycleOwner\nimport androidx.lifecycle.ViewTreeViewModelStoreOwner\nimport androidx.savedstate.setViewTreeSavedStateRegistryOwner' "$MAIN_FILE"
+        fi
 
         cat << 'EOF' > app/build.gradle.kts
         plugins {
